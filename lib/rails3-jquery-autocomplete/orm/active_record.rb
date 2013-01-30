@@ -14,12 +14,13 @@ module Rails3JQueryAutocomplete
         method  = parameters[:method]
         options = parameters[:options]
         scopes  = Array(options[:scopes])
+        base_scope = parameters[:base_scope]
         where   = options[:where]
         limit   = get_autocomplete_limit(options)
         order   = get_autocomplete_order(method, options, model)
 
 
-        items = model.scoped
+        items = (base_scope ? base_scope.call : model.scoped )
 
         scopes.each { |scope| items = items.send(scope) } unless scopes.empty?
 
