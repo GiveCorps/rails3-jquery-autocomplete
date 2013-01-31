@@ -43,7 +43,6 @@ module Rails3JQueryAutocomplete
             :method => method,
             :options => {}
           }
-
           mock(self).get_autocomplete_limit(anything) { 10 }
           mock(self).get_autocomplete_order(anything, anything, anything) { "order ASC" }
           mock(self).get_autocomplete_select_clause(model, method, {}) { ["field"] }
@@ -56,8 +55,43 @@ module Rails3JQueryAutocomplete
               order("order ASC") { 1 }
 
           assert_equal 1, get_autocomplete_items(options)
+
         end
+          context 'with base_scope' do
+            should 'use the base scope instead of the model scope' do
+             class Dog ; end
+
+              model = Dog
+              scoped = []
+              whered = []
+              term = 'query'
+              method = :field
+              base_scope =
+
+              options = {
+                :model => model,
+                :term => term,
+                :method => method,
+                :base_scope => base_scope,
+                :options => {}
+              }
+              mock(self).get_autocomplete_limit(anything) { 10 }
+              mock(self).get_autocomplete_order(anything, anything, anything) { "order ASC" }
+              mock(self).get_autocomplete_select_clause(base_scope, method, {}) { ["field"] }
+              mock(self).get_autocomplete_where_clause(base_scope, term, method, {}) { ["WHERE something"] }
+              mock(base_scope).table_name.times(any_times) { 'model_table_name' }
+
+              dont_allow(model).scoped
+              mock(base_scope).scoped { base_scope }
+              mock(base_scope).select(["field"]) { base_scope }
+              mock(base_scope).where(["WHERE something"]).mock!.limit(10).mock!.
+                  order("order ASC") { 1 }
+
+              assert_equal 1, get_autocomplete_items(options)
+            end
+          end
       end
+
 
       context '#get_autocomplete_select_clause' do
         setup do
