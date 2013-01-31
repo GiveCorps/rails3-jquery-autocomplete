@@ -20,7 +20,7 @@ module Rails3JQueryAutocomplete
         order   = get_autocomplete_order(method, options, model)
 
 
-        items = (base_scope ? base_scope.call : model.scoped )
+        items = (base_scope ? eval(base_scope) : model.scoped )
 
         scopes.each { |scope| items = items.send(scope) } unless scopes.empty?
 
